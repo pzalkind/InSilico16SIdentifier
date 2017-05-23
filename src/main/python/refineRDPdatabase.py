@@ -1,10 +1,15 @@
+#!/usr/bin/python3.4
+
+
 import os
 import sys
 
 
-def refineToNamed(dbFastaIn, dbOut):
-    with open(dbFastaIn, 'r') as db:
-        dbBuffer = db.read().strip('>').split('\n>')
+def refineToNamed(dbOut, *dbFastaIn):
+    dbBuffer = []
+    for dbFasta in dbFastaIn:
+        with open(dbFasta, 'r') as db:
+            dbBuffer = db.read().strip('>').rstrip('\n').split('\n>')
     buffer2 = []
     for elem in dbBuffer:
         # take the first line (header) and remove the part after the tab, which corresponds to the lineage in RDP files
@@ -25,7 +30,6 @@ def refineToNamed(dbFastaIn, dbOut):
 if __name__ == '__main__':
     # go to the input directory, refine the RDP database and save new database with only named organisms, in the same directory
     os.chdir(os.path.dirname(os.path.abspath(sys.argv[1])))
-    outName = str(input('Please provide basename for output file (.fasta will be added)\n')).strip().lower()
-    refineToNamed(sys.argv[1], '{}.fasta'.format(outName))
+    refineToNamed('16S_named_RDP.fasta', sys.argv[1:])
 
 # EOF #
