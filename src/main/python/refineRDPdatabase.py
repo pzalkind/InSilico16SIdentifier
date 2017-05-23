@@ -5,11 +5,11 @@ import os
 import sys
 
 
-def refineToNamed(dbOut, *dbFastaIn):
+def refineToNamed(dbsFastaIn, dbOut):
     dbBuffer = []
-    for dbFasta in dbFastaIn:
+    for dbFasta in dbsFastaIn:
         with open(dbFasta, 'r') as db:
-            dbBuffer = db.read().strip('>').rstrip('\n').split('\n>')
+            dbBuffer.extend(db.read().strip('>').rstrip('\n').split('\n>'))
     buffer2 = []
     for elem in dbBuffer:
         # take the first line (header) and remove the part after the tab, which corresponds to the lineage in RDP files
@@ -25,11 +25,17 @@ def refineToNamed(dbOut, *dbFastaIn):
                 buffer2.append('{0}\n{1}'.format(new_header, '\n'.join(sequence)))
     with open(dbOut, 'w') as newDb:
         newDb.write('\n'.join(buffer2))
+    return 0
+
+
+def create_blast_db(fastaFile):
+    # makeblastdb -in 16S_named_RDP.fasta -out 16S_named_RDP -title 16S_named_RDP -dbtype nucl
+    return 0
 
 
 if __name__ == '__main__':
     # go to the input directory, refine the RDP database and save new database with only named organisms, in the same directory
     os.chdir(os.path.dirname(os.path.abspath(sys.argv[1])))
-    refineToNamed('16S_named_RDP.fasta', sys.argv[1:])
+    refineToNamed(sys.argv[1:], '16S_named_RDP.fasta')
 
 # EOF #

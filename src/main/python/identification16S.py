@@ -4,7 +4,6 @@
 # Needed modules
 import sys
 import subprocess
-import logging
 import gc
 from operator import itemgetter
 from itertools import chain
