@@ -3,6 +3,7 @@
 
 import os
 import sys
+import subprocess
 
 
 def refineToNamed(dbsFastaIn, dbOut):
@@ -29,7 +30,19 @@ def refineToNamed(dbsFastaIn, dbOut):
 
 
 def create_blast_db(fastaFile):
-    # makeblastdb -in 16S_named_RDP.fasta -out 16S_named_RDP -title 16S_named_RDP -dbtype nucl
+    dbName = fastaFile.replace('.fasta', '')
+    proc = subprocess.Popen(['makeblastdb', '-in', fastaFile, '-out', dbName, '-title', dbName, '-dbtype', 'nucl'])
+    out, err = proc.communicate()
+    if proc.returncode != 0:
+        print('Could not create BLAST databank')
+        if (err is not None):
+            print('makeblastdb stderr:\n{}\n'.format(err.decode('utf-8')))
+        return 1
+    else:
+        if (out is not None):
+            print('makeblastdb stdout:\n{}'.format(out.decode('utf-8')))
+        if (err is not None):
+            print('makeblastdb stderr:\n{}\n'.format(err.decode('utf-8')))
     return 0
 
 
@@ -37,5 +50,6 @@ if __name__ == '__main__':
     # go to the input directory, refine the RDP database and save new database with only named organisms, in the same directory
     os.chdir(os.path.dirname(os.path.abspath(sys.argv[1])))
     refineToNamed(sys.argv[1:], '16S_named_RDP.fasta')
+    create_blast_db('16S_named_RDP.fasta')
 
 # EOF #
